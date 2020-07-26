@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include<QLabel>
+#include<QLineEdit>
 #define SCREEN_WIDTH  1000
 #define SCREEN_HIEGHT 600
 #include "logic/Card.h"
@@ -33,8 +34,9 @@ public slots:
     void writeProtocolGameRed(string str);
     void writeProtocolGameGreen(string str);
 private:
-   Game * game = new Game(3);
+   Game * game = new Game(10);
    QList<QLabel*> listLabels;
+   QList<QLineEdit*>listNames;
    void preflop(int n);
     Ui::PokerTable *ui;
     int counter = 1;// считать партии

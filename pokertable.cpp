@@ -17,8 +17,8 @@ PokerTable::PokerTable(QWidget *parent)
     connect(ui->fold,SIGNAL(clicked(bool)),this,SLOT(fold()));
     connect(ui->nextPlayer,SIGNAL(clicked(bool)),this,SLOT(nextPlayer()));
     connect(ui->startButton,SIGNAL(clicked(bool)),this,SLOT(start()));
-     connect(game,SIGNAL(protocolTradeBlack(string)),this,SLOT(writeProtocolGameBlack(string)));
-      connect(game,SIGNAL(protocolTradeGreen(string)),this,SLOT(writeProtocolGameGreen(string)));
+    connect(game,SIGNAL(protocolTradeBlack(string)),this,SLOT(writeProtocolGameBlack(string)));
+    connect(game,SIGNAL(protocolTradeGreen(string)),this,SLOT(writeProtocolGameGreen(string)));
     connect(game,SIGNAL(protocolTradeRed(string)),this,SLOT(writeProtocolGameRed(string)));
     ///  карты на столе
 
@@ -42,7 +42,16 @@ PokerTable::PokerTable(QWidget *parent)
     listLabels.push_back(ui->playerLab9_2);
     listLabels.push_back(ui->playerLab10_1);
     listLabels.push_back(ui->playerLab10_2);
+    for(auto c : listLabels)
+        c->clear();
+    listNames.push_back(ui->name1);  listNames.push_back(ui->name2);  listNames.push_back(ui->name3);
+    listNames.push_back(ui->name4);  listNames.push_back(ui->name5);  listNames.push_back(ui->name6);
+    listNames.push_back(ui->name7);  listNames.push_back(ui->name8);  listNames.push_back(ui->name9);
+    listNames.push_back(ui->name10);
 
+    for(size_t i=0;i< game->getPlayers().size();i++)
+        listNames[i]->setText(QString::fromStdString(
+                     game->getPlayers()[i]->getName()));
 
 }
 void PokerTable::check(){
@@ -162,16 +171,16 @@ void PokerTable::nextGame(){
     game->newStack();
 }
 void PokerTable::writeProtocolGameRed(string str){
-        ui->protocolGame->setTextColor(QColor(255,0,0));
-        ui->protocolGame->append(QString::fromStdString(str));
+    ui->protocolGame->setTextColor(QColor(255,0,0));
+    ui->protocolGame->append(QString::fromStdString(str));
 }
 void PokerTable::writeProtocolGameBlack(string str){
-        ui->protocolGame->setTextColor(QColor(0,0,0));
-        ui->protocolGame->append(QString::fromStdString(str));
+    ui->protocolGame->setTextColor(QColor(0,0,0));
+    ui->protocolGame->append(QString::fromStdString(str));
 }
 void PokerTable::writeProtocolGameGreen(string str){
-        ui->protocolGame->setTextColor(QColor(0,100,0));
-        ui->protocolGame->append(QString::fromStdString(str));
+    ui->protocolGame->setTextColor(QColor(0,100,0));
+    ui->protocolGame->append(QString::fromStdString(str));
 }
 PokerTable::~PokerTable()
 {   delete game;
