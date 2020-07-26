@@ -23,18 +23,20 @@ public slots:
     void nextPlayer(){
          game->nextPlayer();
     }
-    void start(){
-          begin();
-    }
+    void start();
     void check();
     void begin();
     void raise();
     void fold();
-  // void call();
+    void nextGame();
+    void writeProtocolGameBlack(string str);
+    void writeProtocolGameRed(string str);
+    void writeProtocolGameGreen(string str);
 private:
    Game * game = new Game(3);
    QList<QLabel*> listLabels;
    void preflop(int n);
     Ui::PokerTable *ui;
+    int counter = 1;// считать партии
 };
 #endif // POKERTABLE_H

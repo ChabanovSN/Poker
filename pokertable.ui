@@ -66,7 +66,7 @@
      <string>Next</string>
     </property>
    </widget>
-   <widget class="QTextBrowser" name="textBrowser">
+   <widget class="QTextBrowser" name="protocolGame">
     <property name="geometry">
      <rect>
       <x>500</x>
