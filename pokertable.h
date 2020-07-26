@@ -34,7 +34,7 @@ public slots:
     void writeProtocolGameRed(string str);
     void writeProtocolGameGreen(string str);
 private:
-   Game * game = new Game(10);
+   Game * game = new Game(2);
    QList<QLabel*> listLabels;
    QList<QLineEdit*>listNames;
    void preflop(int n);

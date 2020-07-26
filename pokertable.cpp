@@ -49,9 +49,6 @@ PokerTable::PokerTable(QWidget *parent)
     listNames.push_back(ui->name7);  listNames.push_back(ui->name8);  listNames.push_back(ui->name9);
     listNames.push_back(ui->name10);
 
-    for(size_t i=0;i< game->getPlayers().size();i++)
-        listNames[i]->setText(QString::fromStdString(
-                     game->getPlayers()[i]->getName()));
 
 }
 void PokerTable::check(){
@@ -98,11 +95,11 @@ void PokerTable::begin(){
         writeProtocolGameRed("Game ~~ "+to_string(counter++)+" ~~");
         game->preflop(); /// PREFLOP
 
-
-
         size_t players =game->getPlayers().size();
         size_t labels =players * 2;
         for( size_t p=0,l=0;p<players && l<labels;++p,++l){
+            listNames[p]->setText(
+                        QString::fromStdString( game->getPlayers().at(p)->getName()));
             listLabels[l]->setPixmap(
                         QPixmap(
                             game->getPlayers().at(p)->getCards().at(0)->getPath().data()
@@ -113,14 +110,21 @@ void PokerTable::begin(){
                             game->getPlayers().at(p)->getCards().at(1)->getPath().data()
                             ));
             listLabels[l]->setScaledContents(true);
-        }
+       // }
+  //  }
+
+    }
         ui->spinBox->setValue(game->getStavke());
-        if(game->getPlayers().size()>2){ // если играком больше 3 то они делают ставки
-            game->trade();
+    }
 
-        }
+        if(game->getPlayers().size()>2) // если играком больше 3 то они делают ставки
+               if (!game->getEndGame())
+                              game->trade();
+
+
+
         ui->checkButton->setText(QString("Check"));
-
+   if (!game->getEndGame()){
         game->flop();
         if(game->getCommomCards().size()==3){
             ui->comLabel1->setPixmap(
@@ -133,15 +137,18 @@ void PokerTable::begin(){
             ui->comLabel2->setScaledContents(true);
             ui->comLabel3->setScaledContents(true);
 
-        }
+        }        
         game->trade();
+           if (!game->getEndGame()){
         game->turn();
         if(game->getCommomCards().size()==4){
             ui->comLabel4->setPixmap(
                         QPixmap(game->getCommomCards().at(3)->getPath().data()));
             ui->comLabel4->setScaledContents(true);
         }
+       }
         game->trade();
+           if (!game->getEndGame()){
         game->river();
         if(game->getCommomCards().size()==5){
             ui->comLabel5->setPixmap(
@@ -149,6 +156,7 @@ void PokerTable::begin(){
             ui->comLabel5->setScaledContents(true);
         }
         ui->checkButton->setText(QString("Call"));
+       }
         game->trade();
         game->howWinner();
         game->checkMoney();
@@ -158,6 +166,7 @@ void PokerTable::begin(){
     }
 }
 void PokerTable::nextGame(){
+      game->setEndGame(false);
     game->getCommomCards().clear();
     for(auto p: game->getPlayers())
         p->clearCard();
