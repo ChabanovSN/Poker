@@ -15,40 +15,27 @@ PokerTable::PokerTable(QWidget *parent)
     connect(ui->checkButton,SIGNAL(clicked(bool)),this,SLOT(check()));
     connect(ui->raise,SIGNAL(clicked(bool)),this,SLOT(raise()));
     connect(ui->fold,SIGNAL(clicked(bool)),this,SLOT(fold()));
-    connect(ui->nextPlayer,SIGNAL(clicked(bool)),this,SLOT(nextPlayer()));
+    connect(ui->All_in,SIGNAL(clicked(bool)),this,SLOT(All_in()));
     connect(ui->startButton,SIGNAL(clicked(bool)),this,SLOT(start()));
     connect(game,SIGNAL(protocolTradeBlack(string)),this,SLOT(writeProtocolGameBlack(string)));
     connect(game,SIGNAL(protocolTradeGreen(string)),this,SLOT(writeProtocolGameGreen(string)));
     connect(game,SIGNAL(protocolTradeRed(string)),this,SLOT(writeProtocolGameRed(string)));
     ///  карты на столе
 
-    listLabels.push_back(ui->playerLab1_1);
-    listLabels.push_back(ui->playerLab1_2);
-    listLabels.push_back(ui->playerLab2_1);
-    listLabels.push_back(ui->playerLab2_2);
-    listLabels.push_back(ui->playerLab3_1);
-    listLabels.push_back(ui->playerLab3_2);
-    listLabels.push_back(ui->playerLab4_1);
-    listLabels.push_back(ui->playerLab4_2);
-    listLabels.push_back(ui->playerLab5_1);
-    listLabels.push_back(ui->playerLab5_2);
-    listLabels.push_back(ui->playerLab6_1);
-    listLabels.push_back(ui->playerLab6_2);
-    listLabels.push_back(ui->playerLab7_1);
-    listLabels.push_back(ui->playerLab7_2);
-    listLabels.push_back(ui->playerLab8_1);
-    listLabels.push_back(ui->playerLab8_2);
-    listLabels.push_back(ui->playerLab9_1);
-    listLabels.push_back(ui->playerLab9_2);
-    listLabels.push_back(ui->playerLab10_1);
-    listLabels.push_back(ui->playerLab10_2);
-    for(auto c : listLabels)
-        c->clear();
-    listNames.push_back(ui->name1);  listNames.push_back(ui->name2);  listNames.push_back(ui->name3);
-    listNames.push_back(ui->name4);  listNames.push_back(ui->name5);  listNames.push_back(ui->name6);
-    listNames.push_back(ui->name7);  listNames.push_back(ui->name8);  listNames.push_back(ui->name9);
-    listNames.push_back(ui->name10);
-
+    listCards ={ui->playerLab1_1,ui->playerLab1_2,ui->playerLab2_1,
+                ui->playerLab2_2,ui->playerLab3_1,ui->playerLab3_2,
+                ui->playerLab4_1,ui->playerLab4_2,ui->playerLab5_1,
+                ui->playerLab5_2,ui->playerLab6_1,ui->playerLab6_2,
+                ui->playerLab7_1,ui->playerLab7_2,ui->playerLab8_1,
+                ui->playerLab8_2,ui->playerLab9_1,ui->playerLab9_2,
+                ui->playerLab10_1,ui->playerLab10_2};
+    for(auto c : listCards) c->clear();
+    //имена играков
+    listNames ={ui->name1,ui->name2,ui->name3,
+                ui->name4,ui->name5,ui->name6,ui->name7,ui->name8,ui->name9,ui->name10};
+    // деньги
+    listMoney={ui->labelMoney1,ui->labelMoney2,ui->labelMoney3,ui->labelMoney4,ui->labelMoney5,
+               ui->labelMoney6,ui->labelMoney7,ui->labelMoney8,ui->labelMoney9,ui->labelMoney10};
 
 }
 void PokerTable::check(){
@@ -84,47 +71,48 @@ void PokerTable::start(){
         ui->startButton->setStyleSheet("background-color: red");
         begin();
     }else{
-        nextGame();
-        begin();
+        game->checkMoney();
+        // QMessageBox::information(this, QString::fromUtf8("ХРЕНЬ"), QString::fromUtf8("Вы победили!"));
+        if(game->getEndGame()){
+            for(auto p : game->getPlayers()){
+                if(p->getWinner())
+                    QMessageBox::information(this,
+                                             QString::fromUtf8("Поздравляю!!!"),
+                                             QString::fromStdString( p->getName()+ " вы победили!"));
+            }
+        }else{
+            nextGame();
+            begin();
+        }
     }
 }
 void PokerTable::begin(){
-
+    cout<<"Game"<<counter<<endl;
 
     if (!game->getEndGame()){
         writeProtocolGameRed("Game ~~ "+to_string(counter++)+" ~~");
         game->preflop(); /// PREFLOP
-
-        size_t players =game->getPlayers().size();
-        size_t labels =players * 2;
-        for( size_t p=0,l=0;p<players && l<labels;++p,++l){
-            listNames[p]->setText(
+        for( size_t p=0;p<game->getPlayers().size();p++){
+            int id = game->getPlayers().at(p)->getId()-1;
+            listNames[id]->setText(
                         QString::fromStdString( game->getPlayers().at(p)->getName()));
-            listLabels[l]->setPixmap(
-                        QPixmap(
-                            game->getPlayers().at(p)->getCards().at(0)->getPath().data()
-                            ));
-            listLabels[l]->setScaledContents(true);
-            listLabels[++l]->setPixmap(
-                        QPixmap(
-                            game->getPlayers().at(p)->getCards().at(1)->getPath().data()
-                            ));
-            listLabels[l]->setScaledContents(true);
-       // }
-  //  }
-
-    }
+            listCards[id*2]->setPixmap(
+                        QPixmap(game->getPlayers().at(p)->getCards().at(0)->getPath().data()));
+            listCards[id*2+1]->setPixmap(
+                        QPixmap(game->getPlayers().at(p)->getCards().at(1)->getPath().data()));
+        }
+        writeMoney();
         ui->spinBox->setValue(game->getStavke());
     }
 
-        if(game->getPlayers().size()>2) // если играком больше 3 то они делают ставки
-               if (!game->getEndGame())
-                              game->trade();
+    if(game->getPlayers().size()>2) // если играком больше 3 то они делают ставки
+        if (!game->getEndGame())
+            game->trade();
+    writeMoney();
 
 
-
-        ui->checkButton->setText(QString("Check"));
-   if (!game->getEndGame()){
+    ui->checkButton->setText(QString("Check"));
+    if (!game->getEndGame()){
         game->flop();
         if(game->getCommomCards().size()==3){
             ui->comLabel1->setPixmap(
@@ -133,44 +121,46 @@ void PokerTable::begin(){
                         QPixmap(game->getCommomCards().at(1)->getPath().data()));
             ui->comLabel3->setPixmap(
                         QPixmap(game->getCommomCards().at(2)->getPath().data()));
-            ui->comLabel1->setScaledContents(true);
-            ui->comLabel2->setScaledContents(true);
-            ui->comLabel3->setScaledContents(true);
+            game->trade();
+            writeMoney();
+        }
 
-        }        
-        game->trade();
-           if (!game->getEndGame()){
-        game->turn();
-        if(game->getCommomCards().size()==4){
-            ui->comLabel4->setPixmap(
-                        QPixmap(game->getCommomCards().at(3)->getPath().data()));
-            ui->comLabel4->setScaledContents(true);
+        if (!game->getEndGame()){
+            game->turn();
+            if(game->getCommomCards().size()==4)
+                ui->comLabel4->setPixmap(
+                            QPixmap(game->getCommomCards().at(3)->getPath().data()));
+
+
+            game->trade();
+            writeMoney();
         }
-       }
-        game->trade();
-           if (!game->getEndGame()){
-        game->river();
-        if(game->getCommomCards().size()==5){
-            ui->comLabel5->setPixmap(
-                        QPixmap(game->getCommomCards().at(4)->getPath().data()));
-            ui->comLabel5->setScaledContents(true);
+
+        if (!game->getEndGame()){
+            game->river();
+            if(game->getCommomCards().size()==5)
+                ui->comLabel5->setPixmap(
+                            QPixmap(game->getCommomCards().at(4)->getPath().data()));
+
+
+            ui->checkButton->setText(QString("Call"));
+            game->trade();
+            writeMoney();
         }
-        ui->checkButton->setText(QString("Call"));
-       }
-        game->trade();
         game->howWinner();
         game->checkMoney();
+        writeMoney();
 
 
 
     }
 }
 void PokerTable::nextGame(){
-      game->setEndGame(false);
+    game->setEndGame(false);
     game->getCommomCards().clear();
     for(auto p: game->getPlayers())
         p->clearCard();
-    for(auto c : listLabels)
+    for(auto c : listCards)
         c->clear();
     ui->comLabel1->clear();
     ui->comLabel2->clear();
@@ -178,6 +168,15 @@ void PokerTable::nextGame(){
     ui->comLabel4->clear();
     ui->comLabel5->clear();
     game->newStack();
+    game->setDiller();
+}
+void PokerTable::writeMoney(){
+    for( size_t p=0;p<game->getPlayers().size();p++){
+        int id = game->getPlayers().at(p)->getId()-1;
+        int money = game->getPlayers().at(p)->getMoney();
+        listMoney[id]->setText(QString::number(money));
+    }
+    ui->labelBank->setText(QString::number(game->getBank()));
 }
 void PokerTable::writeProtocolGameRed(string str){
     ui->protocolGame->setTextColor(QColor(255,0,0));
@@ -190,6 +189,17 @@ void PokerTable::writeProtocolGameBlack(string str){
 void PokerTable::writeProtocolGameGreen(string str){
     ui->protocolGame->setTextColor(QColor(0,100,0));
     ui->protocolGame->append(QString::fromStdString(str));
+}
+void PokerTable::All_in(){
+    for( size_t p=0;p<game->getPlayers().size();p++)
+        if(game->getPlayers().at(p)->getId()==1){
+            int money = game->getPlayers().at(p)->getMoney();
+            ui->spinBox->setValue(money);
+            break;
+
+        }
+
+    // writeMoney();
 }
 PokerTable::~PokerTable()
 {   delete game;

@@ -21,9 +21,7 @@ public:
     ~PokerTable();
 
 public slots:
-    void nextPlayer(){
-         game->nextPlayer();
-    }
+    void All_in();
     void start();
     void check();
     void begin();
@@ -34,8 +32,10 @@ public slots:
     void writeProtocolGameRed(string str);
     void writeProtocolGameGreen(string str);
 private:
-   Game * game = new Game(2);
-   QList<QLabel*> listLabels;
+    void writeMoney();
+   Game * game = new Game(8);
+   QList<QLabel*> listCards;
+   QList<QLabel*> listMoney;
    QList<QLineEdit*>listNames;
    void preflop(int n);
     Ui::PokerTable *ui;
