@@ -1,12 +1,12 @@
-#include "pokertable.h"
-
+#include"menustart.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
 
     QApplication a(argc, argv);
-    PokerTable w;
-    w.show();
-    return a.exec();
+  //  PokerTable w;
+      MenuStart w;
+      w.show();
+   return a.exec();
 }

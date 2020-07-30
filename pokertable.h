@@ -17,7 +17,8 @@ class PokerTable : public QMainWindow
     Q_OBJECT
 
 public:
-    PokerTable(QWidget *parent = nullptr);
+    PokerTable(int players,int money, int blind,QWidget *parent = nullptr);
+
     ~PokerTable();
 
 public slots:
@@ -32,8 +33,9 @@ public slots:
     void writeProtocolGameRed(string str);
     void writeProtocolGameGreen(string str);
 private:
+
     void writeMoney();
-   Game * game = new Game(8);
+   Game * game ;
    QList<QLabel*> listCards;
    QList<QLabel*> listMoney;
    QList<QLineEdit*>listNames;

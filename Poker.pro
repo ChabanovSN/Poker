@@ -16,17 +16,23 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    alonesetting.cpp \
     main.cpp \
+    menustart.cpp \
     pokertable.cpp
 
 HEADERS += \
+    alonesetting.h \
     logic/Card.h \
     logic/FindWinner.h \
     logic/Game.h \
     logic/Player.h \
+    menustart.h \
     pokertable.h
 
 FORMS += \
+    alonesetting.ui \
+    menustart.ui \
     pokertable.ui
 
 TRANSLATIONS += \

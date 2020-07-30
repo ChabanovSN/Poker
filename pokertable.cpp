@@ -1,17 +1,22 @@
 #include "pokertable.h"
 #include "ui_pokertable.h"
 #include<QMessageBox>
-PokerTable::PokerTable(QWidget *parent)
+PokerTable::PokerTable(int players,int money, int blind,QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::PokerTable)
 {
-
+    ui->setupUi(this);
     QPixmap bkgnd(":/images/green-table.jpg");
     bkgnd = bkgnd.scaled(SCREEN_WIDTH*2 ,SCREEN_HIEGHT*1.2);
     QPalette palette;
     palette.setBrush(QPalette::Background, bkgnd);
     this->setPalette(palette);
-    ui->setupUi(this);
+
+    this->setWindowTitle(QString("Poker"));
+    ui->combo->setPixmap( QPixmap(":/images/combo.png"));
+ //   ui->combo->setScaledContents(true);
+       game = new Game(players,money,blind);
+
     connect(ui->checkButton,SIGNAL(clicked(bool)),this,SLOT(check()));
     connect(ui->raise,SIGNAL(clicked(bool)),this,SLOT(raise()));
     connect(ui->fold,SIGNAL(clicked(bool)),this,SLOT(fold()));
@@ -38,6 +43,8 @@ PokerTable::PokerTable(QWidget *parent)
                ui->labelMoney6,ui->labelMoney7,ui->labelMoney8,ui->labelMoney9,ui->labelMoney10};
 
 }
+
+
 void PokerTable::check(){
 
     if(ui->checkButton->text() == QString("Check")){
@@ -66,6 +73,8 @@ void PokerTable::fold(){
     game->nextPlayer();
 }
 void PokerTable::start(){
+
+
     if(ui->startButton->text() == QString("Start game")){
         ui->startButton->setText("Next party");
         ui->startButton->setStyleSheet("background-color: red");
@@ -82,11 +91,13 @@ void PokerTable::start(){
             }
         }else{
             nextGame();
-            begin();
+            if(!game->getEndGame())
+                            begin();
         }
     }
 }
 void PokerTable::begin(){
+    ui->startButton->hide();
     cout<<"Game"<<counter<<endl;
 
     if (!game->getEndGame()){
@@ -150,7 +161,7 @@ void PokerTable::begin(){
         game->howWinner();
         game->checkMoney();
         writeMoney();
-
+          ui->startButton->show();
 
 
     }
@@ -201,6 +212,7 @@ void PokerTable::All_in(){
 
     // writeMoney();
 }
+
 PokerTable::~PokerTable()
 {   delete game;
     delete ui;

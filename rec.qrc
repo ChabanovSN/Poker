@@ -106,5 +106,10 @@
         <file>images/spades/SKing.png</file>
         <file>images/spades/SLady.jpg</file>
         <file>images/spades/SLady.png</file>
+        <file>images/menu.jpg</file>
+        <file>images/red-card.jpg</file>
+        <file>images/blue-card.jpg</file>
+        <file>images/combo.jpeg</file>
+        <file>images/combo.png</file>
     </qresource>
 </RCC>
