@@ -1,6 +1,7 @@
 #ifndef MENUSTART_H
 #define MENUSTART_H
 #include"alonesetting.h"
+#include"netserverwindow.h"
 #include <QMainWindow>
 
 namespace Ui {
@@ -17,9 +18,11 @@ public:
 
 public slots:
     void startAloneSetting();
+    void startNetSetting();
 private:
     Ui::MenuStart *ui;
     AloneSetting * aloneSetting;
+    NetServerWindow *  netServerWindow;
 };
 
 #endif // MENUSTART_H

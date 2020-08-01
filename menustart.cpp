@@ -13,10 +13,12 @@ MenuStart::MenuStart(QWidget *parent) :
     palette.setBrush(QPalette::Background, bkgnd);
     this->setPalette(palette);
     aloneSetting = new AloneSetting();
+    netServerWindow = new NetServerWindow();
 
-     // подключаем к слоту запуска главного окна по кнопке во втором окне
      connect(aloneSetting, &AloneSetting::MainMenuWindow, this, &MenuStart::show);
      connect(ui->AloneButton,SIGNAL(clicked(bool)),this,SLOT(startAloneSetting()));
+     connect(netServerWindow, &NetServerWindow::MainMenuWindow, this, &MenuStart::show);
+     connect(ui->NetButton,SIGNAL(clicked(bool)),this,SLOT(startNetSetting()));
 
 }
 
@@ -26,9 +28,17 @@ void MenuStart::startAloneSetting(){
     aloneSetting->show();
     this->close();
 }
+void MenuStart::startNetSetting(){
+
+
+    netServerWindow->show();
+    this->close();
+}
+
 
 MenuStart::~MenuStart()
 {
     delete ui;
     delete aloneSetting;
+    delete  netServerWindow;
 }

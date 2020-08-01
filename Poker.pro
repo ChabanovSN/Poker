@@ -1,4 +1,5 @@
-QT       += core gui
+QT       += core gui network
+
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -19,6 +20,7 @@ SOURCES += \
     alonesetting.cpp \
     main.cpp \
     menustart.cpp \
+    netserverwindow.cpp \
     pokertable.cpp
 
 HEADERS += \
@@ -26,13 +28,16 @@ HEADERS += \
     logic/Card.h \
     logic/FindWinner.h \
     logic/Game.h \
+    logic/GameNet.h \
     logic/Player.h \
     menustart.h \
+    netserverwindow.h \
     pokertable.h
 
 FORMS += \
     alonesetting.ui \
     menustart.ui \
+    netserverwindow.ui \
     pokertable.ui
 
 TRANSLATIONS += \

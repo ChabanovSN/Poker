@@ -5,45 +5,16 @@ PokerTable::PokerTable(int players,int money, int blind,QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::PokerTable)
 {
-    ui->setupUi(this);
-    QPixmap bkgnd(":/images/green-table.jpg");
-    bkgnd = bkgnd.scaled(SCREEN_WIDTH*2 ,SCREEN_HIEGHT*1.2);
-    QPalette palette;
-    palette.setBrush(QPalette::Background, bkgnd);
-    this->setPalette(palette);
-
-    this->setWindowTitle(QString("Poker"));
-    ui->combo->setPixmap( QPixmap(":/images/combo.png"));
- //   ui->combo->setScaledContents(true);
        game = new Game(players,money,blind);
-
-    connect(ui->checkButton,SIGNAL(clicked(bool)),this,SLOT(check()));
-    connect(ui->raise,SIGNAL(clicked(bool)),this,SLOT(raise()));
-    connect(ui->fold,SIGNAL(clicked(bool)),this,SLOT(fold()));
-    connect(ui->All_in,SIGNAL(clicked(bool)),this,SLOT(All_in()));
-    connect(ui->startButton,SIGNAL(clicked(bool)),this,SLOT(start()));
-    connect(game,SIGNAL(protocolTradeBlack(string)),this,SLOT(writeProtocolGameBlack(string)));
-    connect(game,SIGNAL(protocolTradeGreen(string)),this,SLOT(writeProtocolGameGreen(string)));
-    connect(game,SIGNAL(protocolTradeRed(string)),this,SLOT(writeProtocolGameRed(string)));
-    ///  карты на столе
-
-    listCards ={ui->playerLab1_1,ui->playerLab1_2,ui->playerLab2_1,
-                ui->playerLab2_2,ui->playerLab3_1,ui->playerLab3_2,
-                ui->playerLab4_1,ui->playerLab4_2,ui->playerLab5_1,
-                ui->playerLab5_2,ui->playerLab6_1,ui->playerLab6_2,
-                ui->playerLab7_1,ui->playerLab7_2,ui->playerLab8_1,
-                ui->playerLab8_2,ui->playerLab9_1,ui->playerLab9_2,
-                ui->playerLab10_1,ui->playerLab10_2};
-    for(auto c : listCards) c->clear();
-    //имена играков
-    listNames ={ui->name1,ui->name2,ui->name3,
-                ui->name4,ui->name5,ui->name6,ui->name7,ui->name8,ui->name9,ui->name10};
-    // деньги
-    listMoney={ui->labelMoney1,ui->labelMoney2,ui->labelMoney3,ui->labelMoney4,ui->labelMoney5,
-               ui->labelMoney6,ui->labelMoney7,ui->labelMoney8,ui->labelMoney9,ui->labelMoney10};
-
+       init();
 }
-
+PokerTable::PokerTable(deque<Player *> players, int blind,QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::PokerTable)
+{
+       game = new Game(players,blind);
+       init();
+}
 
 void PokerTable::check(){
 
@@ -212,7 +183,45 @@ void PokerTable::All_in(){
 
     // writeMoney();
 }
+void PokerTable::init(){
+    ui->setupUi(this);
+    QPixmap bkgnd(":/images/green-table.jpg");
+    bkgnd = bkgnd.scaled(SCREEN_WIDTH*2 ,SCREEN_HIEGHT*1.2);
+    QPalette palette;
+    palette.setBrush(QPalette::Background, bkgnd);
+    this->setPalette(palette);
 
+    this->setWindowTitle(QString("Poker"));
+    ui->combo->setPixmap( QPixmap(":/images/combo.png"));
+ //   ui->combo->setScaledContents(true);
+
+
+    connect(ui->checkButton,SIGNAL(clicked(bool)),this,SLOT(check()));
+    connect(ui->raise,SIGNAL(clicked(bool)),this,SLOT(raise()));
+    connect(ui->fold,SIGNAL(clicked(bool)),this,SLOT(fold()));
+    connect(ui->All_in,SIGNAL(clicked(bool)),this,SLOT(All_in()));
+    connect(ui->startButton,SIGNAL(clicked(bool)),this,SLOT(start()));
+    connect(game,SIGNAL(protocolTradeBlack(string)),this,SLOT(writeProtocolGameBlack(string)));
+    connect(game,SIGNAL(protocolTradeGreen(string)),this,SLOT(writeProtocolGameGreen(string)));
+    connect(game,SIGNAL(protocolTradeRed(string)),this,SLOT(writeProtocolGameRed(string)));
+    ///  карты на столе
+
+    listCards ={ui->playerLab1_1,ui->playerLab1_2,ui->playerLab2_1,
+                ui->playerLab2_2,ui->playerLab3_1,ui->playerLab3_2,
+                ui->playerLab4_1,ui->playerLab4_2,ui->playerLab5_1,
+                ui->playerLab5_2,ui->playerLab6_1,ui->playerLab6_2,
+                ui->playerLab7_1,ui->playerLab7_2,ui->playerLab8_1,
+                ui->playerLab8_2,ui->playerLab9_1,ui->playerLab9_2,
+                ui->playerLab10_1,ui->playerLab10_2};
+    for(auto c : listCards) c->clear();
+    //имена играков
+    listNames ={ui->name1,ui->name2,ui->name3,
+                ui->name4,ui->name5,ui->name6,ui->name7,ui->name8,ui->name9,ui->name10};
+    // деньги
+    listMoney={ui->labelMoney1,ui->labelMoney2,ui->labelMoney3,ui->labelMoney4,ui->labelMoney5,
+               ui->labelMoney6,ui->labelMoney7,ui->labelMoney8,ui->labelMoney9,ui->labelMoney10};
+
+}
 PokerTable::~PokerTable()
 {   delete game;
     delete ui;

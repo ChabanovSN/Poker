@@ -17,10 +17,14 @@ class PokerTable : public QMainWindow
     Q_OBJECT
 
 public:
+
     PokerTable(int players,int money, int blind,QWidget *parent = nullptr);
-
+    PokerTable(deque<Player *> players, int blind,QWidget *parent = nullptr);
     ~PokerTable();
-
+    void init();
+    Game * getGame(){
+        return  game;
+    }
 public slots:
     void All_in();
     void start();
