@@ -21,6 +21,7 @@ SOURCES += \
     main.cpp \
     menustart.cpp \
     netserverwindow.cpp \
+    pokerclient.cpp \
     pokertable.cpp
 
 HEADERS += \
@@ -32,12 +33,14 @@ HEADERS += \
     logic/Player.h \
     menustart.h \
     netserverwindow.h \
+    pokerclient.h \
     pokertable.h
 
 FORMS += \
     alonesetting.ui \
     menustart.ui \
     netserverwindow.ui \
+    pokerclient.ui \
     pokertable.ui
 
 TRANSLATIONS += \

@@ -6,6 +6,7 @@ PokerTable::PokerTable(int players,int money, int blind,QWidget *parent)
     , ui(new Ui::PokerTable)
 {
        game = new Game(players,money,blind);
+
        init();
 }
 PokerTable::PokerTable(deque<Player *> players, int blind,QWidget *parent)
@@ -68,7 +69,7 @@ void PokerTable::start(){
     }
 }
 void PokerTable::begin(){
-    ui->startButton->hide();
+  //  ui->startButton->hide();
     cout<<"Game"<<counter<<endl;
 
     if (!game->getEndGame()){
@@ -103,7 +104,10 @@ void PokerTable::begin(){
                         QPixmap(game->getCommomCards().at(1)->getPath().data()));
             ui->comLabel3->setPixmap(
                         QPixmap(game->getCommomCards().at(2)->getPath().data()));
+
+
             game->trade();
+
             writeMoney();
         }
 

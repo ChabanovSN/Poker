@@ -25,6 +25,7 @@ public:
     Game * getGame(){
         return  game;
     }
+
 public slots:
     void All_in();
     void start();

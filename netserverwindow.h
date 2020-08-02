@@ -8,7 +8,7 @@
 #include <QByteArray>
 #include <QDebug>
 #include"pokertable.h"
-
+#include"pokerclient.h"
 namespace Ui {
 class NetServerWindow;
 }
@@ -31,8 +31,8 @@ private slots:
     void showButtomForServer();
     void on_starting_server();
     // slots for client
-    void slotlAllClient();
-
+    void slotlAllClient(QString,QString);
+//    void     slotlAllClientCom(QString,QString);
     void onSokConnectedForClient();
     void onSokDisconnectedForClient();
     void hideButtomForClient();
@@ -43,6 +43,7 @@ private slots:
 private:
     deque<Player *> player;
     PokerTable * poker;
+    PokerClient * pokerClient;
     Ui::NetServerWindow *ui;
     QTcpServer *tcpServer;
     int server_status;
