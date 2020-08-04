@@ -6,26 +6,32 @@ NetServerWindow::NetServerWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::NetServerWindow)
 {     pokerClient = new PokerClient();
-    ui->setupUi(this);
-    this->setWindowTitle(QString("Poker"));
-    QPixmap bkgnd(":/images/blue-card.jpg");
-    bkgnd = bkgnd.scaled(620 ,420);
-    QPalette palette;
-    palette.setBrush(QPalette::Background, bkgnd);
-    this->setPalette(palette);
-    connect(ui->returnMainMenu,SIGNAL(clicked(bool)),this,SLOT(returnToMainMenu()));
-    connect(ui->game,SIGNAL(clicked(bool)),this,SLOT(game()));
 
-    //client
-    connect(ui->radioButtonServer,SIGNAL(clicked(bool)),this,SLOT(showButtomForServer()));
-    // connect(&clientSocketStatic, SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(onSokDisplayError(QAbstractSocket::SocketError)));
-    connect(ui->radioButtonCliennt,SIGNAL(clicked(bool)),this,SLOT(hideButtomForClient()));
-    //connect(this,SIGNAL(signalAllClient()),this,SLOT(slotlAllClient()));
+      connect(pokerClient,SIGNAL(signalButtonWasPush(QString)),this,SLOT(sendPlayerChooseButton(QString)));
 
 
-    // connect(ui->starting,SIGNAL(clicked(bool)),this,SLOT(on_starting_clicked()));
-    // connect(ui->stoping,SIGNAL(clicked(bool)),this,SLOT(on_stoping_clicked()));
-    hideButtomForClient();
+
+
+        ui->setupUi(this);
+          this->setWindowTitle(QString("Poker"));
+          QPixmap bkgnd(":/images/blue-card.jpg");
+            bkgnd = bkgnd.scaled(620 ,420);
+              QPalette palette;
+                palette.setBrush(QPalette::Background, bkgnd);
+                  this->setPalette(palette);
+                  connect(ui->returnMainMenu,SIGNAL(clicked(bool)),this,SLOT(returnToMainMenu()));
+                    connect(ui->game,SIGNAL(clicked(bool)),this,SLOT(game()));
+
+                      //client
+                      connect(ui->radioButtonServer,SIGNAL(clicked(bool)),this,SLOT(showButtomForServer()));
+                        // connect(&clientSocketStatic, SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(onSokDisplayError(QAbstractSocket::SocketError)));
+                        connect(ui->radioButtonCliennt,SIGNAL(clicked(bool)),this,SLOT(hideButtomForClient()));
+                          //connect(this,SIGNAL(signalAllClient()),this,SLOT(slotlAllClient()));
+
+
+                          connect(ui->start,SIGNAL(clicked(bool)),this,SLOT(on_starting_clicked()));
+                          connect(ui->stop,SIGNAL(clicked(bool)),this,SLOT(on_stoping_clicked()));
+                              hideButtomForClient();
 }
 /// BEGIN PART CLIENT
 
@@ -46,21 +52,24 @@ void NetServerWindow::on_starting_clicked()
 }
 
 void NetServerWindow::on_stoping_clicked()
-{
-    if(server_status==1){
-        foreach(int i,SClients.keys()){
-            QTextStream os(SClients[i]);
-            os.setAutoDetectUnicode(true);
-            os << QTime::currentTime().toString() << "\n";
-            SClients[i]->close();
-            SClients.remove(i);
+{  if(ui->radioButtonServer->isChecked()){
+        if(server_status==1){
+            foreach(int i,SClients.keys()){
+                QTextStream os(SClients[i]);
+                os.setAutoDetectUnicode(true);
+                os << QTime::currentTime().toString() << "\n";
+                SClients[i]->close();
+                SClients.remove(i);
+            }
+            tcpServer->close();
+            ui->textinfo->append(QString::fromUtf8("Сервер остановлен!"));
+            qDebug() << QString::fromUtf8("Сервер остановлен!");
+            server_status=0;
+            ui->game->setDisabled(true);
+            ui->radioButtonCliennt->setDisabled(false);
         }
-        tcpServer->close();
-        ui->textinfo->append(QString::fromUtf8("Сервер остановлен!"));
-        qDebug() << QString::fromUtf8("Сервер остановлен!");
-        server_status=0;
-        ui->game->setDisabled(true);
-        ui->radioButtonCliennt->setDisabled(false);
+    }else{
+        onSokDisconnectedForClient();
     }
 }
 
@@ -76,6 +85,7 @@ void NetServerWindow::newuser()
         SClients[idusersocs]=clientSocket;
         connect(SClients[idusersocs],SIGNAL(readyRead()),this, SLOT(slotReadClientOnServers()));
 
+       // connect(SClients[idusersocs],SIGNAL(ready()),this, SLOT(madeTradeToUser()));
         ui->textinfo->append("Ip: " +  clientSocket->peerAddress().toString());
         //  ui->textinfo->append("SClients[idusersocs]" + QString::number( idusersocs));
     }
@@ -83,27 +93,29 @@ void NetServerWindow::newuser()
 
 
 void NetServerWindow::slotReadClientOnServers()
-{   int idusersocs=9999;
-    // if (clientSocket == 0)
-    clientSocket = (QTcpSocket*)sender(); // ловлю сокет клиента
+{
+      int idusersocs=0;
+    if (clientSocket == 0)
+        clientSocket = (QTcpSocket*)sender(); // ловлю сокет клиента
     idusersocs=clientSocket->socketDescriptor();
     QTextStream os(clientSocket);
     os.setAutoDetectUnicode(true);
 
     QString info = QString::fromUtf8(clientSocket->readAll());
     QStringList list =  info.split(QRegExp("~"));
- qDebug()<<" on server "<<info<<endl;
+    qDebug()<<" on server "<<info<<endl;
     if(list.at(1).toInt()==0){
         Player * pl = new Player();
         pl->setInfoPlaeyr(list.at(2));
         pl->setId(player.size()+1);
+        pl->setUserDescriptor(idusersocs);
         if(player.size()<=10){
             player.push_back(pl);
             info=QString::fromStdString( "Присоединился игрок " + pl->getName() +" сумма на счете "+to_string(pl->getMoney()));
             //
             ui->textinfo->append(info);
             os <<passwd<<"~"<<"1"<<"~"
-                  <<pl->getInfoPlayer();
+              <<pl->getInfoPlayer();
             // << QTime::currentTime().toString() << "\n";
             // os.flush();
         }
@@ -120,17 +132,14 @@ void NetServerWindow::game(){
     complitlyGroup = true;
     int blind   = ui->spinBoxBlind->value();
     poker = new PokerTable(player,blind);
-   // emit signalAllClient();
+    // emit signalAllClient();
     connect(poker->getGame(),SIGNAL(signalAllClient(QString,QString)),this,SLOT(slotlAllClient(QString,QString)));
+    connect(poker->getGame(),SIGNAL(signalSendTradeToUser(int,int)),this,SLOT(sendTradeToUser(int,int)));
 
     this->close();
     poker->show();
 
 
-}
-void NetServerWindow::returnToMainMenu(){
-    this->close();      // Закрываем окно
-    emit MainMenuWindow(); // И вызываем сигнал на открытие главного окна
 }
 
 void NetServerWindow::on_starting_server(){
@@ -175,11 +184,51 @@ void NetServerWindow::on_starting_server(){
 }
 
 
+void NetServerWindow::sendTradeToUser(int descriptor,int stavka){
+ //   qDebug()<<"sendTradeToUser "<<descriptor <<endl;
+     QString spt("~");
 
+          tradeString
+            .append(QString::number(stavka));
+           tradeDiscripor=descriptor;
+slotlAllClient( tradeString,"777");
+//           qDebug()<<"sendTradeToUser "<<tradeString <<endl;
+//          SClients[tradeDiscripor]->write(tradeString.toUtf8().constData());
+          tradeDiscripor=0;
+          tradeString.clear();
+
+}
+void NetServerWindow::madeTradeToUser(){
+    qDebug()<<"sendTradeToUser "<<tradeString <<endl;
+   SClients[tradeDiscripor]->write(tradeString.toUtf8().constData());
+   tradeDiscripor=0;
+   tradeString.clear();
+//    QTextStream os(SClients[descriptor]);
+//    os.setAutoDetectUnicode(true);
+//    os<<passwd+"~"+"777"+"~"+QString::number(stavka);
+//    os.flush();
+}
+void NetServerWindow::slotlAllClient(QString gameString,QString code){
+    //if( complitlyGroup){
+    // complitlyGroup = false;
+
+    qDebug()<<"slotlAllClient "<< passwd+"~"+code+"~"+gameString<<endl;;
+    foreach(int i,SClients.keys()){
+        QTextStream os(SClients[i]);
+        os.setAutoDetectUnicode(true);
+        os<<passwd+"~"+code+"~"+gameString;
+        os.flush();
+
+    }
+
+
+    //}
+}
+////////////////////////////////////////////////////////////////////////////////////
+////////// CLIENT   CLIENT CLIENT ///////////////////////////////////////////////
 void NetServerWindow::on_starting_client(){
     onSokConnectedForClient();
 }
-
 
 void NetServerWindow::onSokConnectedForClient(){
 
@@ -212,7 +261,12 @@ void NetServerWindow::onSokConnectedForClient(){
     ui->radioButtonServer->setDisabled(true);
 
     connect(&clientSocketStatic,SIGNAL(connected()), this, SLOT(onSokReadyReadForClient()));
+
     connect(&clientSocketStatic,SIGNAL(readyRead()), this, SLOT(onSokReadyReadForClient()));
+
+    //connect(&clientSocketStatic,SIGNAL(signalButtonWasPush(QString)), this, SLOT(sendPlayerChooseButton(QString)));
+
+
 }
 
 void NetServerWindow::onSokDisconnectedForClient(){
@@ -234,38 +288,41 @@ void NetServerWindow::onSokReadyReadForClient(){
     }
     else{
         QString info = QString::fromUtf8(clientSocketStatic.readLine());
-          info.remove(QRegExp("\n"));
-        qDebug()<<" on clinet "<<info<<endl;
+        info.remove(QRegExp("\n"));
+        qDebug()<<" on clinet info "<<info<<endl;
         QStringList list =  info.split(QRegExp("~"));
 
         QString info2 = QString::fromUtf8(clientSocketStatic.readLine());
-          info2.remove(QRegExp("\n"));
+        info2.remove(QRegExp("\n"));
         if(info2.size()>0){
-             QStringList   list =  info2.split(QRegExp("~"));
-               if(list.at(1).toInt()==888){// код только для общих карт
-                            qDebug()<<" on clinet 888 "<<info2<<endl
-                                   <<list.at(2)<<endl;
-                          if(pokerClient !=nullptr)
-                               emit pokerClient->signalAllClientCommomCards(list.at(2));
-                          else
-                                qDebug()<<" on clinet 888 FUCK "<<endl;
-                       }
-          }
+            QStringList   list =  info2.split(QRegExp("~"));
+            if(list.at(1).toInt()==888){// код только для общих карт
+                qDebug()<<" on clinet 888 "<<info2<<endl
+                       <<list.at(2)<<endl;
+                if(pokerClient !=nullptr)
+                    emit pokerClient->signalAllClientCommomCards(list.at(2));
+                else
+                    qDebug()<<" on clinet 888 FUCK "<<endl;
+            }
+        }
         if(list.at(1).toInt()==999){ // код до флопа
 
             emit pokerClient->signalAllClient(list.at(2));
 
-           // poker->getGame()->stringToGame(list.at(2));
+            // poker->getGame()->stringToGame(list.at(2));
             this->close();
             pokerClient->show();
-
-
+        }
+        else if(list.at(1).toInt()==777){
+            qDebug()<<" on clinet 777 "<< " stavka" <<list.at(2).toInt()<<endl;
+            emit pokerClient->signalYourStep();
+            /// ответ sendPlayerChooseButton(QString);
         }
 
         else{
 
             if(list.at(1).toInt()==1){
-                 info= list.at(2);
+                info= list.at(2);
                 player[0]->setInfoPlaeyr(info);
                 info = QString::fromStdString(player[0]->getName()+" вы "+
                         to_string(player[0]->getId()) +"-й игрок\nОжидаете формирование команды");
@@ -274,36 +331,27 @@ void NetServerWindow::onSokReadyReadForClient(){
         }
     }
 }
-void NetServerWindow::slotlAllClient(QString gameString,QString code){
-    //if( complitlyGroup){
-       // complitlyGroup = false;
-              qDebug()<<"slotlAllClient "<< passwd+"~"+code+"~"+gameString<<endl;;
-        foreach(int i,SClients.keys()){
-            QTextStream os(SClients[i]);
-            os.setAutoDetectUnicode(true);
-            os<<passwd+"~"+code+"~"+gameString;
-            os.flush();
-        }
 
 
-    //}
+
+//from client
+
+void NetServerWindow::sendPlayerChooseButton(QString str){
+    // отправить строку выбранной кнопки
+    //вывафыв
+    qDebug()<<"sendPlayerChooseButtonax "<<str;
 }
-//void NetServerWindow::slotlAllClientCom(QString gameString,QString code){
-//    //if( complitlyGroup){
-//       // complitlyGroup = false;
-//      //  QString str("999");
-//         qDebug()<<"slotlAllClient "<< passwd<<"~"<<code<<"~"<<gameString<<endl;;
-//        foreach(int i,SClients.keys()){
-//            QTextStream os(SClients[i]);
-//            os.setAutoDetectUnicode(true);
-//            os <<passwd<<"~"<<code<<"~"<<gameString;
-//            os.flush();
-//        }
-
-    //}
 
 
 
+
+
+///////////////////////////////////////////////////////////////
+/// SERVICE
+void NetServerWindow::returnToMainMenu(){
+    this->close();      // Закрываем окно
+    emit MainMenuWindow(); // И вызываем сигнал на открытие главного окна
+}
 
 void NetServerWindow::showButtomForServer(){
     ui->spinBoxBlind->show();

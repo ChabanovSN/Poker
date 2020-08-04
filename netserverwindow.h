@@ -30,7 +30,11 @@ private slots:
     void newuser();
     void showButtomForServer();
     void on_starting_server();
+    void madeTradeToUser();
+    void sendTradeToUser(int descriptor,int stavka);
     // slots for client
+
+    void sendPlayerChooseButton(QString);
     void slotlAllClient(QString,QString);
 //    void     slotlAllClientCom(QString,QString);
     void onSokConnectedForClient();
@@ -69,7 +73,8 @@ public:
 //    Field *EnemyField;
 
 private:
-
+     QString tradeString="";
+     int     tradeDiscripor=0;
 };
 
 #endif // NETSERVERWINDOW_H

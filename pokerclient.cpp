@@ -28,6 +28,7 @@ void PokerClient::writePlayersCardNames(){
 
     writeMoney();
     ui->spinBox->setValue(game->getStavke());
+
 }
 void PokerClient::writeCommonCards(){
     if(game->getCommomCards().size()==3){
@@ -47,6 +48,9 @@ void PokerClient::writeMoney(){
     }
     ui->labelBank->setText(QString::number(game->getBank()));
 }
+
+
+
 void PokerClient::init(){
      game = new GameNet();
     ui->setupUi(this);
@@ -60,16 +64,22 @@ void PokerClient::init(){
     ui->combo->setPixmap( QPixmap(":/images/combo.png"));
  //   ui->combo->setScaledContents(true);
 
+      ui->checkButton->setDisabled(true);
+      ui->raise->setDisabled(true);
+      ui->fold->setDisabled(true);
+      ui->All_in->setDisabled(true);
 
-//    connect(ui->checkButton,SIGNAL(clicked(bool)),this,SLOT(check()));
-//    connect(ui->raise,SIGNAL(clicked(bool)),this,SLOT(raise()));
-//    connect(ui->fold,SIGNAL(clicked(bool)),this,SLOT(fold()));
-//    connect(ui->All_in,SIGNAL(clicked(bool)),this,SLOT(All_in()));
+    connect(ui->checkButton,SIGNAL(clicked(bool)),this,SLOT(check()));
+  //  connect(ui->raise,SIGNAL(clicked(bool)),this,SLOT(raise()));
+  //  connect(ui->fold,SIGNAL(clicked(bool)),this,SLOT(fold()));
+  //  connect(ui->All_in,SIGNAL(clicked(bool)),this,SLOT(All_in()));
 //    connect(ui->startButton,SIGNAL(clicked(bool)),this,SLOT(start()));
     connect(this,SIGNAL(signalAllClient(QString)),game,SLOT(stringToGame(QString)));
     connect(this,SIGNAL(signalAllClientCommomCards(QString)),game,SLOT(commonCardsFromString(QString)));
 
-//
+
+     connect(this,SIGNAL(signalYourStep()),this,SLOT(actuveAllButton()));
+
     connect(game,SIGNAL(signalwriteCommonCards()),this,SLOT(writeCommonCards()));
     connect(game,SIGNAL(signalwritePlayersCardNames()),this,SLOT(writePlayersCardNames()));
     connect(game,SIGNAL(protocolTradeBlack(string)),this,SLOT(writeProtocolGameBlack(string)));
@@ -94,6 +104,27 @@ void PokerClient::init(){
 
 }
 
+void PokerClient::check(){
+
+    if(ui->checkButton->text() == QString("Check")){
+        game->setPlayerChoose(4,game->getStavke());
+    }
+    if(ui->checkButton->text() == QString("Call")){
+        game->setPlayerChoose(2,game->getStavke());
+    }
+    stringPlayerChoose = game->getPlayerChoose();
+  //  qDebug()<<"PokerClient::check() "<<stringPlayerChoose;
+     emit signalButtonWasPush(stringPlayerChoose);
+
+}
+
+void PokerClient::actuveAllButton(){
+    ui->checkButton->setDisabled(false);
+    ui->raise->setDisabled(false);
+    ui->fold->setDisabled(false);
+    ui->All_in->setDisabled(false);
+
+}
 void PokerClient::writeProtocolGameRed(string str){
     ui->protocolGame->setTextColor(QColor(255,0,0));
     ui->protocolGame->append(QString::fromStdString(str));

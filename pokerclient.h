@@ -21,13 +21,24 @@ public:
 signals:
     void signalAllClient(QString);
     void signalAllClientCommomCards(QString);
+    void signalYourStep();
+    void signalButtonWasPush(QString);
 public slots:
+    void actuveAllButton();
     void writeProtocolGameBlack(string str);
     void writeProtocolGameRed(string str);
     void writeProtocolGameGreen(string str);
     void writeMoney();
     void writePlayersCardNames();
     void writeCommonCards();
+
+   // void All_in();
+  //  void start();
+    void check();
+   // void begin();
+  //  void raise();
+  //  void fold();
+
 private:
     GameNet * game;
     Ui::PokerClient *ui;
@@ -36,6 +47,8 @@ private:
     QList<QLineEdit*>listNames;
     void preflop(int n);
     int counter = 1;// считать партии
+    QString stringPlayerChoose="";
+
 };
 
 #endif // POKERCLIENT_H

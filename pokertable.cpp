@@ -75,14 +75,25 @@ void PokerTable::begin(){
     if (!game->getEndGame()){
         writeProtocolGameRed("Game ~~ "+to_string(counter++)+" ~~");
         game->preflop(); /// PREFLOP
+        QPixmap pix(":/images/rubashka.jpg");
+
         for( size_t p=0;p<game->getPlayers().size();p++){
             int id = game->getPlayers().at(p)->getId()-1;
             listNames[id]->setText(
                         QString::fromStdString( game->getPlayers().at(p)->getName()));
+                 if(game->getPlayers().at(p)->getIsComputer()==false){
             listCards[id*2]->setPixmap(
                         QPixmap(game->getPlayers().at(p)->getCards().at(0)->getPath().data()));
             listCards[id*2+1]->setPixmap(
                         QPixmap(game->getPlayers().at(p)->getCards().at(1)->getPath().data()));
+
+                 }else{
+                     listCards[id*2]->setPixmap(pix);
+                     listCards[id*2]->setScaledContents(true);
+                     listCards[id*2+1]->setPixmap(pix);
+                     listCards[id*2+1]->setScaledContents(true);
+                 }
+
         }
         writeMoney();
         ui->spinBox->setValue(game->getStavke());
@@ -134,6 +145,21 @@ void PokerTable::begin(){
             writeMoney();
         }
         game->howWinner();
+
+        for( size_t p=0;p<game->getPlayers().size();p++){
+            int id = game->getPlayers().at(p)->getId()-1;
+            listNames[id]->setText(
+                        QString::fromStdString( game->getPlayers().at(p)->getName()));
+
+            listCards[id*2]->setPixmap(
+                        QPixmap(game->getPlayers().at(p)->getCards().at(0)->getPath().data()));
+            listCards[id*2+1]->setPixmap(
+                        QPixmap(game->getPlayers().at(p)->getCards().at(1)->getPath().data()));
+
+
+
+        }
+
         game->checkMoney();
         writeMoney();
           ui->startButton->show();
