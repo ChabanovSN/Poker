@@ -160,7 +160,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Вовзрат в главное меню</string>
+     <string>В главное меню</string>
     </property>
    </widget>
    <widget class="QPushButton" name="exitBUtton">

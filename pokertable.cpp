@@ -69,8 +69,7 @@ void PokerTable::start(){
     }
 }
 void PokerTable::begin(){
-  //  ui->startButton->hide();
-    cout<<"Game"<<counter<<endl;
+    ui->startButton->hide();
 
     if (!game->getEndGame()){
         writeProtocolGameRed("Game ~~ "+to_string(counter++)+" ~~");
