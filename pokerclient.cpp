@@ -64,10 +64,8 @@ void PokerClient::init(){
     ui->combo->setPixmap( QPixmap(":/images/combo.png"));
  //   ui->combo->setScaledContents(true);
 
-      ui->checkButton->setDisabled(true);
-      ui->raise->setDisabled(true);
-      ui->fold->setDisabled(true);
-      ui->All_in->setDisabled(true);
+      disactiveAllButton();
+
 
     connect(ui->checkButton,SIGNAL(clicked(bool)),this,SLOT(check()));
   //  connect(ui->raise,SIGNAL(clicked(bool)),this,SLOT(raise()));
@@ -78,7 +76,7 @@ void PokerClient::init(){
     connect(this,SIGNAL(signalAllClientCommomCards(QString)),game,SLOT(commonCardsFromString(QString)));
 
 
-     connect(this,SIGNAL(signalYourStep()),this,SLOT(actuveAllButton()));
+     connect(this,SIGNAL(signalYourStep()),this,SLOT(activeAllButton()));
 
     connect(game,SIGNAL(signalwriteCommonCards()),this,SLOT(writeCommonCards()));
     connect(game,SIGNAL(signalwritePlayersCardNames()),this,SLOT(writePlayersCardNames()));
@@ -113,17 +111,24 @@ void PokerClient::check(){
         game->setPlayerChoose(2,game->getStavke());
     }
     stringPlayerChoose = game->getPlayerChoose();
-  //  qDebug()<<"PokerClient::check() "<<stringPlayerChoose;
+
+    disactiveAllButton();
      emit signalButtonWasPush(stringPlayerChoose);
 
 }
 
-void PokerClient::actuveAllButton(){
+void PokerClient::activeAllButton(){
     ui->checkButton->setDisabled(false);
     ui->raise->setDisabled(false);
     ui->fold->setDisabled(false);
     ui->All_in->setDisabled(false);
 
+}
+void PokerClient::disactiveAllButton(){
+    ui->checkButton->setDisabled(true);
+    ui->raise->setDisabled(true);
+    ui->fold->setDisabled(true);
+    ui->All_in->setDisabled(true);
 }
 void PokerClient::writeProtocolGameRed(string str){
     ui->protocolGame->setTextColor(QColor(255,0,0));

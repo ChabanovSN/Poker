@@ -24,7 +24,7 @@ signals:
     void signalYourStep();
     void signalButtonWasPush(QString);
 public slots:
-    void actuveAllButton();
+    void activeAllButton();
     void writeProtocolGameBlack(string str);
     void writeProtocolGameRed(string str);
     void writeProtocolGameGreen(string str);
@@ -38,7 +38,8 @@ public slots:
    // void begin();
   //  void raise();
   //  void fold();
-
+public:
+    void disactiveAllButton();
 private:
     GameNet * game;
     Ui::PokerClient *ui;

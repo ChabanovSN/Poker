@@ -75,7 +75,6 @@ void PokerTable::begin(){
         writeProtocolGameRed("Game ~~ "+to_string(counter++)+" ~~");
         game->preflop(); /// PREFLOP
         QPixmap pix(":/images/rubashka.jpg");
-
         for( size_t p=0;p<game->getPlayers().size();p++){
             int id = game->getPlayers().at(p)->getId()-1;
             listNames[id]->setText(

@@ -23,26 +23,33 @@ public:
 signals:
     void MainMenuWindow();
     void signalAllClient();
-private slots:
+    void signalAnswerFromCLient(QString);
+public slots:
     // slots for server
+    void slotlAllClient(QString,QString);
+    void sendToClient(QTcpSocket* pSocket,const char *);
+    void showButtomForServer();
+    void madeTradeToUser();
+    void sendTradeToUser(int descriptor,int stavka);    
+    void slotNewConnection();
+    void slotReadClient ();
+    void gameOnServer();
+    // slots for client
+    void slotReadyRead ();
+    void slotError (QAbstractSocket::SocketError);
+    void slotButtonWasPush(QString);
+    void slotSendToServer(const char *);
+    void slotConnected ();
+    void slotDisconnectOnClient();
+    //slot for service
+    void hideButtomForClient();
     void on_starting_clicked();
     void on_stoping_clicked();
-    void newuser();
-    void showButtomForServer();
+    void returnToMainMenu();
+private:
     void on_starting_server();
-    void madeTradeToUser();
-    void sendTradeToUser(int descriptor,int stavka);
-    // slots for client
+    void on_starting_client();
 
-    void sendPlayerChooseButton(QString);
-    void slotlAllClient(QString,QString);
-//    void     slotlAllClientCom(QString,QString);
-    void onSokConnectedForClient();
-    void onSokDisconnectedForClient();
-    void hideButtomForClient();
-
-     void on_starting_client();
-   ///
 
 private:
     deque<Player *> player;
@@ -52,29 +59,17 @@ private:
     QTcpServer *tcpServer;
     int server_status;
     QMap<int,QTcpSocket *> SClients;
-    QString passwd;
+    string passwd;
     string name;
     QTcpSocket * clientSocket; // for server
-     QTcpSocket  clientSocketStatic; //for client
-     bool complitlyGroup = false;
+    //   QTcpSocket  clientSocketStatic; //for client
+    bool complitlyGroup = false;
+    QString tradeString="";
+    int     tradeDiscripor=0;
 
-public slots:
-    //slot for server
-     void slotReadClientOnServers();
-    //slot for client
-    void onSokReadyReadForClient();
-     //////
-     void game();
-     void returnToMainMenu();
-public:
-//    void setMyFild(Field  *field = 0);
-//    void setEnemyFild(Field  *field = 0);
-//    Field *MyField;
-//    Field *EnemyField;
+     bool firstConnect = false;
+     quint16 m_nNextBlockSize;
 
-private:
-     QString tradeString="";
-     int     tradeDiscripor=0;
 };
 
 #endif // NETSERVERWINDOW_H
