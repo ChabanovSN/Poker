@@ -72,7 +72,11 @@ void PokerTable::begin(){
     ui->startButton->hide();
 
     if (!game->getEndGame()){
-        writeProtocolGameRed("Game ~~ "+to_string(counter++)+" ~~");
+
+        writeProtocolGameRed("Game  "+to_string(counter)+" ");
+        emit game->signalProtocolTrade("Game  "+to_string(counter)+"  ","R");
+        counter++;
+
         game->preflop(); /// PREFLOP
         QPixmap pix(":/images/rubashka.jpg");
         for( size_t p=0;p<game->getPlayers().size();p++){
@@ -249,6 +253,19 @@ void PokerTable::init(){
     listMoney={ui->labelMoney1,ui->labelMoney2,ui->labelMoney3,ui->labelMoney4,ui->labelMoney5,
                ui->labelMoney6,ui->labelMoney7,ui->labelMoney8,ui->labelMoney9,ui->labelMoney10};
 
+}
+void PokerTable::activeAllButton(){
+    ui->checkButton->setDisabled(false);
+    ui->raise->setDisabled(false);
+    ui->fold->setDisabled(false);
+    ui->All_in->setDisabled(false);
+
+}
+void PokerTable::disactiveAllButton(){
+    ui->checkButton->setDisabled(true);
+    ui->raise->setDisabled(true);
+    ui->fold->setDisabled(true);
+    ui->All_in->setDisabled(true);
 }
 PokerTable::~PokerTable()
 {   delete game;

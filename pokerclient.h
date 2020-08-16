@@ -32,14 +32,20 @@ public slots:
     void writePlayersCardNames();
     void writeCommonCards();
 
-   // void All_in();
+    void All_in();
   //  void start();
     void check();
    // void begin();
-  //  void raise();
-  //  void fold();
+   void raise();
+    void fold();
 public:
     void disactiveAllButton();
+    void setIdCurrenClient(int n){
+        idCurrentClient=n;
+    }
+    GameNet * getGame(){
+        return game;
+    }
 private:
     GameNet * game;
     Ui::PokerClient *ui;
@@ -48,7 +54,8 @@ private:
     QList<QLineEdit*>listNames;
     void preflop(int n);
     int counter = 1;// считать партии
-    QString stringPlayerChoose="";
+    int idCurrentClient = 0;
+ //   QString stringPlayerChoose="";
 
 };
 

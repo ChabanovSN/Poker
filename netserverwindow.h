@@ -20,6 +20,7 @@ class NetServerWindow : public QMainWindow
 public:
     explicit NetServerWindow(QWidget *parent = nullptr);
     ~NetServerWindow();
+      void sendToClient(QTcpSocket* pSocket,const char *);
 signals:
     void MainMenuWindow();
     void signalAllClient();
@@ -27,17 +28,18 @@ signals:
 public slots:
     // slots for server
     void slotlAllClient(QString,QString);
-    void sendToClient(QTcpSocket* pSocket,const char *);
-    void showButtomForServer();
-    void madeTradeToUser();
+
+    void showButtomForServer();   
     void sendTradeToUser(int descriptor,int stavka);    
     void slotNewConnection();
     void slotReadClient ();
     void gameOnServer();
+    void slotProtocolTrade(string str,string color);
     // slots for client
     void slotReadyRead ();
     void slotError (QAbstractSocket::SocketError);
     void slotButtonWasPush(QString);
+
     void slotSendToServer(const char *);
     void slotConnected ();
     void slotDisconnectOnClient();
@@ -57,18 +59,12 @@ private:
     PokerClient * pokerClient;
     Ui::NetServerWindow *ui;
     QTcpServer *tcpServer;
-    int server_status;
+
     QMap<int,QTcpSocket *> SClients;
     string passwd;
     string name;
-    QTcpSocket * clientSocket; // for server
-    //   QTcpSocket  clientSocketStatic; //for client
-    bool complitlyGroup = false;
-    QString tradeString="";
-    int     tradeDiscripor=0;
+    QTcpSocket * clientSocket;
 
-     bool firstConnect = false;
-     quint16 m_nNextBlockSize;
 
 };
 

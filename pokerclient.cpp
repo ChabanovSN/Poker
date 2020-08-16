@@ -1,19 +1,15 @@
 #include "pokerclient.h"
 #include "ui_pokerclient.h"
-
+#include<QMessageBox>
 PokerClient::PokerClient(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::PokerClient)
-{
-
-
+    ui(new Ui::PokerClient){
     init();
-
 }
 
 void PokerClient::writePlayersCardNames(){
-    writeProtocolGameRed("Game ~~ "+to_string(counter++)+" ~~");
-  //  game->preflop(); /// PREFLOP
+    // writeProtocolGameRed("Game ~~ "+to_string(counter++)+" ~~");
+    /// PREFLOP
     for( size_t p=0;p<game->getPlayers().size();p++){
         int id = game->getPlayers().at(p)->getId()-1;
         listNames[id]->setText(
@@ -38,7 +34,14 @@ void PokerClient::writeCommonCards(){
                     QPixmap(game->getCommomCards().at(1)->getPath().data()));
         ui->comLabel3->setPixmap(
                     QPixmap(game->getCommomCards().at(2)->getPath().data()));
-}
+    }
+    if(game->getCommomCards().size()==4)
+        ui->comLabel4->setPixmap(
+                    QPixmap(game->getCommomCards().at(3)->getPath().data()));
+    if(game->getCommomCards().size()==5)
+        ui->comLabel5->setPixmap(
+                    QPixmap(game->getCommomCards().at(4)->getPath().data()));
+
 }
 void PokerClient::writeMoney(){
     for( size_t p=0;p<game->getPlayers().size();p++){
@@ -52,7 +55,7 @@ void PokerClient::writeMoney(){
 
 
 void PokerClient::init(){
-     game = new GameNet();
+    game = new GameNet();
     ui->setupUi(this);
     QPixmap bkgnd(":/images/green-table.jpg");
     bkgnd = bkgnd.scaled(SCREEN_WIDTH*2 ,SCREEN_HIEGHT*1.2);
@@ -62,21 +65,21 @@ void PokerClient::init(){
 
     this->setWindowTitle(QString("Poker"));
     ui->combo->setPixmap( QPixmap(":/images/combo.png"));
- //   ui->combo->setScaledContents(true);
+    //   ui->combo->setScaledContents(true);
 
-      disactiveAllButton();
+    disactiveAllButton();
 
 
     connect(ui->checkButton,SIGNAL(clicked(bool)),this,SLOT(check()));
-  //  connect(ui->raise,SIGNAL(clicked(bool)),this,SLOT(raise()));
-  //  connect(ui->fold,SIGNAL(clicked(bool)),this,SLOT(fold()));
-  //  connect(ui->All_in,SIGNAL(clicked(bool)),this,SLOT(All_in()));
-//    connect(ui->startButton,SIGNAL(clicked(bool)),this,SLOT(start()));
+    connect(ui->raise,SIGNAL(clicked(bool)),this,SLOT(raise()));
+    connect(ui->fold,SIGNAL(clicked(bool)),this,SLOT(fold()));
+    connect(ui->All_in,SIGNAL(clicked(bool)),this,SLOT(All_in()));
+    //    connect(ui->startButton,SIGNAL(clicked(bool)),this,SLOT(start()));
     connect(this,SIGNAL(signalAllClient(QString)),game,SLOT(stringToGame(QString)));
     connect(this,SIGNAL(signalAllClientCommomCards(QString)),game,SLOT(commonCardsFromString(QString)));
 
 
-     connect(this,SIGNAL(signalYourStep()),this,SLOT(activeAllButton()));
+    connect(this,SIGNAL(signalYourStep()),this,SLOT(activeAllButton()));
 
     connect(game,SIGNAL(signalwriteCommonCards()),this,SLOT(writeCommonCards()));
     connect(game,SIGNAL(signalwritePlayersCardNames()),this,SLOT(writePlayersCardNames()));
@@ -110,11 +113,37 @@ void PokerClient::check(){
     if(ui->checkButton->text() == QString("Call")){
         game->setPlayerChoose(2,game->getStavke());
     }
-    stringPlayerChoose = game->getPlayerChoose();
 
     disactiveAllButton();
-     emit signalButtonWasPush(stringPlayerChoose);
+    emit signalButtonWasPush(game->getPlayerChoose());
 
+}
+void PokerClient::raise(){
+
+    int stavka = ui->spinBox->value();
+    if(stavka>game->getStavke()){
+        game->setPlayerChoose(1,stavka);
+        disactiveAllButton();
+        emit signalButtonWasPush(game->getPlayerChoose());
+    }
+    else
+        QMessageBox::information(this, QString::fromUtf8("Внимание!"), QString::fromUtf8("Ваша ставка должна быть больше!"));
+
+}
+void PokerClient::All_in(){
+    for( size_t p=0;p<game->getPlayers().size();p++)
+        if(game->getPlayers().at(p)->getId()==idCurrentClient){
+            int money = game->getPlayers().at(p)->getMoney();
+            ui->spinBox->setValue(money);
+            break;
+
+        }
+}
+void PokerClient::fold(){
+    game->setPlayerChoose(3,game->getStavke());
+
+    disactiveAllButton();
+    emit signalButtonWasPush(game->getPlayerChoose());
 }
 
 void PokerClient::activeAllButton(){

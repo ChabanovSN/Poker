@@ -25,7 +25,8 @@ public:
     Game * getGame(){
         return  game;
     }
-
+   void activeAllButton();
+   void disactiveAllButton();
 public slots:
     void All_in();
     void start();
